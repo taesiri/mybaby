@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MyBaby Image Generator</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Space Grotesk", "Avenir Next", "Trebuchet MS", sans-serif;
+        background: linear-gradient(135deg, #fdf5d6 0%, #f7f1ff 50%, #d6f6ff 100%);
+        --ink: #111111;
+        --accent: #ff6b00;
+        --accent-dark: #d45500;
+        --paper: #ffffff;
+        --shadow: #111111;
+      }
+      body {
+        margin: 0;
+        padding: 2.5rem 1.5rem 4rem;
+        color: var(--ink);
+      }
+      .container {
+        max-width: 980px;
+        margin: 0 auto;
+        display: grid;
+        gap: 2rem;
+      }
+      .hero {
+        padding: 2rem;
+        background: #ffe94d;
+        border: 4px solid var(--ink);
+        box-shadow: 12px 12px 0 var(--shadow);
+      }
+      .hero h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(2.4rem, 3vw, 3.2rem);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+      }
+      .hero p {
+        margin: 0;
+        font-size: 1.1rem;
+        max-width: 56ch;
+      }
+      .grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        align-items: stretch;
+      }
+      .stack {
+        display: grid;
+        gap: 1.5rem;
+        height: 100%;
+      }
+      .card {
+        background: var(--paper);
+        border: 4px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--shadow);
+        padding: 1.5rem;
+      }
+      form {
+        display: grid;
+        gap: 1rem;
+      }
+      label {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.06em;
+      }
+      input, textarea, select {
+        padding: 0.75rem 0.9rem;
+        border-radius: 0;
+        border: 3px solid var(--ink);
+        font-size: 1rem;
+        background: #fffbe9;
+        box-shadow: 4px 4px 0 var(--shadow);
+      }
+      input[type="file"] {
+        display: none;
+      }
+      .file-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #00d084;
+        border: 4px solid var(--ink);
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 6px 6px 0 var(--shadow);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .file-button:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 10px 10px 0 var(--shadow);
+      }
+      .file-meta {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      textarea {
+        resize: vertical;
+      }
+      button {
+        background: var(--accent);
+        border: 4px solid var(--ink);
+        padding: 0.9rem 1.4rem;
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 6px 6px 0 var(--shadow);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      button:hover {
+        background: var(--accent-dark);
+        transform: translate(-2px, -2px);
+        box-shadow: 10px 10px 0 var(--shadow);
+      }
+      .hint {
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+      }
+      .progress-wrap {
+        display: none;
+        align-items: center;
+        gap: 1rem;
+      }
+      .progress-bar {
+        position: relative;
+        flex: 1;
+        height: 18px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 4px 4px 0 var(--shadow);
+      }
+      .progress-bar span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: #00d084;
+      }
+      .progress-bar.indeterminate span {
+        width: 30%;
+        animation: slide 1s linear infinite;
+      }
+      @keyframes slide {
+        0% { transform: translateX(-10%); }
+        100% { transform: translateX(230%); }
+      }
+      .preview {
+        display: grid;
+        gap: 1rem;
+      }
+      .preview h2 {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .preview img {
+        width: 100%;
+        border: 4px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--shadow);
+        background: #fff;
+      }
+      .thumbs {
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      }
+      .thumbs img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+      }
+      .placeholder {
+        border: 3px dashed var(--ink);
+        padding: 1rem;
+        text-align: center;
+        font-weight: 600;
+        background: #fffbe9;
+        box-shadow: 4px 4px 0 var(--shadow);
+      }
+      .preview-box {
+        border: 3px dashed var(--ink);
+        padding: 1rem;
+        background: #fffbe9;
+        box-shadow: 4px 4px 0 var(--shadow);
+      }
+      .uploads-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+      }
+      .uploads-panel .preview-box {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .uploads-panel .thumbs {
+        flex: 1;
+        align-content: start;
+      }
+      .status {
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section class="hero">
+        <h1>MyBaby Studio</h1>
+        <p>Upload up to five 3D ultrasound images and craft the final baby portrait.</p>
+      </section>
+
+      <div class="grid">
+        <section class="card preview uploads-panel">
+          <h2>Uploads</h2>
+          <div>
+            <label for="images">Ultrasound Images (1–5)</label>
+            <input id="images" name="images" type="file" accept="image/*" multiple required form="generate-form" />
+            <label class="file-button" for="images">Choose files</label>
+            <div class="file-meta" id="file-meta">No files selected.</div>
+            <div class="hint">Tip: include different angles for a more accurate result.</div>
+          </div>
+          <div class="preview-box">
+            <div class="status" id="result-status">Upload images to see a preview.</div>
+            <div class="thumbs" id="upload-previews"></div>
+          </div>
+        </section>
+
+        <div class="stack">
+          <section class="card">
+            <form id="generate-form" enctype="multipart/form-data">
+              <div>
+                <label for="hair_color">Hair Color</label>
+                <input id="hair_color" name="hair_color" type="text" placeholder="e.g. dark brown" />
+              </div>
+              <div>
+                <label for="hair_amount">Hair Amount</label>
+                <select id="hair_amount" name="hair_amount">
+                  <option value="">Select</option>
+                  <option value="very little">Very little</option>
+                  <option value="light fuzz">Light fuzz</option>
+                  <option value="medium">Medium</option>
+                  <option value="full">Full</option>
+                </select>
+              </div>
+              <div>
+                <label for="skin_tone">Skin Color</label>
+                <input id="skin_tone" name="skin_tone" type="text" placeholder="e.g. warm medium" />
+              </div>
+              <div>
+                <label for="eye_color">Eye Color</label>
+                <input id="eye_color" name="eye_color" type="text" placeholder="e.g. hazel" />
+              </div>
+              <div>
+                <label for="extra_notes">Extra Notes</label>
+                <textarea id="extra_notes" name="extra_notes" rows="3" placeholder="e.g. soft natural lighting, gentle smile"></textarea>
+              </div>
+              <button type="submit">Generate Baby Image</button>
+              <div class="progress-wrap" id="progress-wrap">
+                <div class="progress-bar"><span id="progress-bar"></span></div>
+                <div class="status" id="progress-status">Uploading…</div>
+              </div>
+            </form>
+          </section>
+
+          <section class="card preview">
+            <h2>Generated</h2>
+            <div class="placeholder" id="result-placeholder">Your generated image will appear here.</div>
+            <img id="result-image" alt="Generated baby output" hidden />
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("generate-form");
+      const progressWrap = document.getElementById("progress-wrap");
+      const progressBar = document.getElementById("progress-bar");
+      const progressStatus = document.getElementById("progress-status");
+      const resultImage = document.getElementById("result-image");
+      const resultStatus = document.getElementById("result-status");
+      const previews = document.getElementById("upload-previews");
+      const resultPlaceholder = document.getElementById("result-placeholder");
+      const fileMeta = document.getElementById("file-meta");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const files = formData.getAll("images");
+        if (files.length < 1 || files.length > 5) {
+          resultStatus.textContent = "Please upload between 1 and 5 images.";
+          return;
+        }
+
+        console.log("Submitting generation request with", files.length, "file(s).");
+        progressWrap.style.display = "flex";
+        progressBar.style.width = "0%";
+        progressBar.parentElement.classList.remove("indeterminate");
+        progressStatus.textContent = "Uploading…";
+        resultStatus.textContent = "Generating image…";
+        resultImage.removeAttribute("src");
+        resultImage.hidden = true;
+        resultPlaceholder.style.display = "block";
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/generate");
+        xhr.responseType = "blob";
+
+        xhr.upload.onprogress = (evt) => {
+          if (evt.lengthComputable) {
+            const percent = Math.round((evt.loaded / evt.total) * 100);
+            progressBar.style.width = `${percent}%`;
+            progressStatus.textContent = `Uploading… ${percent}%`;
+          }
+        };
+        xhr.upload.onloadend = () => {
+          progressStatus.textContent = "Generating…";
+          progressBar.style.removeProperty("width");
+          progressBar.parentElement.classList.add("indeterminate");
+        };
+
+        xhr.onload = async () => {
+          progressWrap.style.display = "none";
+          progressBar.parentElement.classList.remove("indeterminate");
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const url = URL.createObjectURL(xhr.response);
+            resultImage.src = url;
+            resultImage.hidden = false;
+            resultPlaceholder.style.display = "none";
+            resultStatus.textContent = "Done. Tap image to download.";
+            resultImage.onclick = () => {
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "mybaby-output.png";
+              link.click();
+            };
+          } else {
+            let errorText = "Generation failed.";
+            try {
+              const text = await xhr.response.text();
+              if (text) {
+                errorText = text;
+              }
+            } catch (err) {
+              console.warn("Failed to read error response.", err);
+            }
+            console.error("Generation failed with status", xhr.status, errorText);
+            resultStatus.textContent = errorText;
+          }
+        };
+
+        xhr.onerror = () => {
+          progressWrap.style.display = "none";
+          progressBar.parentElement.classList.remove("indeterminate");
+          console.error("Network error during generation request.");
+          resultStatus.textContent = "Network error while generating.";
+        };
+
+        xhr.send(formData);
+      });
+
+      document.getElementById("images").addEventListener("change", (event) => {
+        const files = Array.from(event.target.files || []).slice(0, 5);
+        previews.innerHTML = "";
+        if (!files.length) {
+          resultStatus.textContent = "Upload images to see a preview.";
+          fileMeta.textContent = "No files selected.";
+          return;
+        }
+        fileMeta.textContent = `${files.length} file(s) selected.`;
+        resultStatus.textContent = "Previewing uploaded images.";
+        for (const file of files) {
+          const img = document.createElement("img");
+          img.alt = file.name || "Uploaded ultrasound";
+          const url = URL.createObjectURL(file);
+          img.src = url;
+          img.onload = () => URL.revokeObjectURL(url);
+          previews.appendChild(img);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-# My Babay!
+# My Baby!
 
 ![MyBaby Studio preview](assets/imgs/preview.png)
 
@@ -42,7 +42,7 @@ uv run python -m mybaby.app
 
 Open http://127.0.0.1:5000 and upload 1–5 ultrasound images.
 
-The app uses fixed Gemini models:
+The app uses Gemini 3.0 models:
 - `gemini-3-pro-preview` (prompt refinement)
 - `gemini-3-pro-image-preview` (image generation)
 
